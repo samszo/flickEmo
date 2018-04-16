@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Flick Emo : evaluation</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"  crossorigin="anonymous">  
+	<link type="text/css" rel="stylesheet" href="styles/main.css" />  
+	<script src="scripts/main.js"></script>
+	<script src="scripts/firebase.js"></script>
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyCyMOM1DWwjjXhLMx3fxz5PYUHh-47ex38",
+	    authDomain: "flickemo.firebaseapp.com",
+	    databaseURL: "https://flickemo.firebaseio.com",
+	    projectId: "flickemo",
+	    storageBucket: "flickemo.appspot.com",
+	    messagingSenderId: "563674050041"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+    <script type="text/javascript">
+    var objAjout;
+    window.addEventListener('load', function() {
+  		$('#modalWait').modal();
+    	
+    	
+  	  	//gestion des evenements du menu
+    	$("#nbddSourcesAlea").click(function() {
+    		  console.log('nbddSourcesAlea');
+    			});
+      	$("#nbddSourcesAjout").click(function() {
+      		  console.log('nbddSourcesAjout');
+	      		$('#modalAjoutObjet').modal();
+      		});
+  	  	//gestion des evenements des modals
+    	$("#modalAjoutBtn").click(function() {
+      		$('#modalAjoutObjet').modal('hide');
+      		$('#modalWait').modal();
+    		var typeObj = $('input[name=rbTypeObjet]:checked').val();
+    		var idObj = $("#ajoutIdObjet").val()
+    		setObjetUti(idObj,typeObj);
+  			});
+      	
+  	  	//ajoute les photos
+		//getPhotos();
+		initApp();
+    });
+
+    initApp = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoURL = user.photoURL;
+            var uid = user.uid;
+            var phoneNumber = user.phoneNumber;
+            var providerData = user.providerData;
+            user.getIdToken().then(function(accessToken) {
+              document.getElementById('uti').textContent = displayName;
+              //récupère les informations de l'utilisateur
+              getUtiInfos(providerData[0]);
+            });
+          } else {
+            // User is signed out.
+        	window.location.replace("index.html");
+          }
+        }, function(error) {
+          console.log(error);
+        });
+      };      
+      
+      var dataPhoto, evalPhoto, svgChoix, nbEval = 10, scale = 0.3;
+      var width = window.innerWidth;
+      var height = window.innerHeight-100;
+      
+      var apiKey='40cb47fff0cc7278c71dbec0b496a961', method = 'flickr.groups.pools.getPhotos&group_id=';//flickr.photosets.getPhotos&photoset_id=
+      var ps = '72157693492155044';//72157694232835035,72157664802687517,72157694698922995,72157691214578762,72157693492155044
+      ps = '3070672@N22';
+      
+	  
+		</script>
+  </head>
+  <body>
+	<div class="modal fade" id="modalAjoutObjet" tabindex="-1" role="dialog" aria-labelledby="modalAjoutObjet" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="ajoutObjetLabel">Ajouter une source</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <form>
+	          <div class="form-group">	        
+	            <label for="ajoutIdObjet" class="col-form-label">Type de source :</label>
+				<div class="custom-control custom-radio custom-control-inline">
+				  <input type="radio" id="rbGallerie" value="photosets"  name="rbTypeObjet" class="custom-control-input">
+				  <label class="custom-control-label" for="rbGallerie">Album</label>
+				</div>
+				<div class="custom-control custom-radio custom-control-inline">
+				  <input type="radio" id="rbGroupe" value="group" name="rbTypeObjet" class="custom-control-input">
+				  <label class="custom-control-label" for="rbGroupe">Groupe</label>
+				</div>	        
+	          </div>
+	          <div class="form-group">
+	            <label for="ajoutIdObjet" class="col-form-label">identifiant de la source :</label>
+	            <input type="text" class="form-control" id="ajoutIdObjet" placeholder="3070672@N22">
+	          </div>
+	        </form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	        <button type="button" id="modalAjoutBtn" class="btn btn-primary">Ajouter</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>  
+	<div class="modal fade" id="modalWait" tabindex="-1" role="dialog" aria-labelledby="modalWait" aria-hidden="true">
+	  <div class="modal-dialog" role="document" >
+	    <div class="modal-content" style="width: 330px;">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="ajoutObjetLabel">Merci de patienter...</h5>
+	      </div>
+	      <div class="modal-body">
+  <!-- merci beaucoup à https://codepen.io/madetoday/pen/MYxYeo -->
+<svg id="wrap" width="300" height="300">
+  <!-- background  -->
+  <svg>
+    <circle cx="150" cy="150" r="130" style="stroke: lightblue; stroke-width:18; fill:transparent"/>
+    <circle cx="150" cy="150" r="115" style="fill:#2c3e50"/>
+    <path style="stroke: #2c3e50; stroke-dasharray:820; stroke-dashoffset:820; stroke-width:18; fill:transparent" d="M150,150 m0,-130 a 130,130 0 0,1 0,260 a 130,130 0 0,1 0,-260">
+      <animate attributeName="stroke-dashoffset" dur="6s" to="-820" repeatCount="indefinite"/>
+    </path>
+  </svg>
+  
+  <!-- image -->
+  <svg>
+    <path id="hourglass" d="M150,150 C60,85 240,85 150,150 C60,215 240,215 150,150 Z" style="stroke: white; stroke-width:5; fill:white;" />
+    
+    <path id="frame" d="M100,97 L200, 97 M100,203 L200,203 M110,97 L110,142 M110,158 L110,200 M190,97 L190,142 M190,158 L190,200 M110,150 L110,150 M190,150 L190,150" style="stroke:lightblue; stroke-width:6; stroke-linecap:round" />
+    
+    <animateTransform xlink:href="#frame" attributeName="transform" type="rotate" begin="0s" dur="3s" values="0 150 150; 0 150 150; 180 150 150" keyTimes="0; 0.8; 1" repeatCount="indefinite" />
+    <animateTransform xlink:href="#hourglass" attributeName="transform" type="rotate" begin="0s" dur="3s" values="0 150 150; 0 150 150; 180 150 150" keyTimes="0; 0.8; 1" repeatCount="indefinite" />
+  </svg>
+  
+  <!-- sand -->
+  <svg>
+    <!-- upper part -->
+    <polygon id="upper" points="120,125 180,125 150,147" style="fill:#2c3e50;">
+      <animate attributeName="points" dur="3s" keyTimes="0; 0.8; 1" values="120,125 180,125 150,147; 150,150 150,150 150,150; 150,150 150,150 150,150" repeatCount="indefinite"/>
+    </polygon>
+    
+    <!-- falling sand -->
+    <path id="line" stroke-linecap="round" stroke-dasharray="1,4" stroke-dashoffset="200.00" stroke="#2c3e50" stroke-width="2" d="M150,150 L150,198">
+      <!-- running sand -->
+      <animate attributeName="stroke-dashoffset" dur="3s" to="1.00" repeatCount="indefinite"/>
+      <!-- emptied upper -->
+      <animate attributeName="d" dur="3s" to="M150,195 L150,195" values="M150,150 L150,198; M150,150 L150,198; M150,198 L150,198; M150,195 L150,195" keyTimes="0; 0.65; 0.9; 1" repeatCount="indefinite"/>
+      <!-- last drop -->
+      <animate attributeName="stroke" dur="3s" keyTimes="0; 0.65; 0.8; 1" values="#2c3e50;#2c3e50;transparent;transparent" to="transparent" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- lower part -->
+    <g id="lower">
+      <path d="M150,180 L180,190 A28,10 0 1,1 120,190 L150,180 Z" style="stroke: transparent; stroke-width:5; fill:#2c3e50;">
+        <animateTransform attributeName="transform" type="translate" keyTimes="0; 0.65; 1" values="0 15; 0 0; 0 0" dur="3s" repeatCount="indefinite" />
+      </path>
+      <animateTransform xlink:href="#lower" attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </g>
+    
+    <!-- lower overlay - hourglass -->
+    <path d="M150,150 C60,85 240,85 150,150 C60,215 240,215 150,150 Z" style="stroke: white; stroke-width:5; fill:transparent;">
+      <animateTransform attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </path>
+    
+    <!-- lower overlay - frame -->
+    <path id="frame" d="M100,97 L200, 97 M100,203 L200,203" style="stroke:lightblue; stroke-width:6; stroke-linecap:round">
+      <animateTransform attributeName="transform"
+                    type="rotate"
+                    begin="0s" dur="3s"
+                    values="0 150 150; 0 150 150; 180 150 150"
+                    keyTimes="0; 0.8; 1"
+                    repeatCount="indefinite"/>
+    </path>
+  </svg>
+  
+</svg>	      
+	      </div>
+	      <div class="modal-footer">
+	      </div>
+	    </div>
+	  </div>
+	</div>  
+	
+	<div class="container-fluid">	  
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<a class="navbar-brand" href="#">
+				<h4 class="text-center" >Flick Emo</h4>
+				<h5 id='titreListe' style="font-style:italic;" ></h5>
+				<h5 id='auteurListe' class="text-center" ></h5>
+				<h6 class="text-center" >
+					<span >Photo : </span>
+					<span id='numTof' ></span><span > / </span><span id='nbTof' ></span>
+				</h6>
+			</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarTogglerDemo02"
+				aria-controls="navbarTogglerDemo02" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+				<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+					<li class="nav-item active"><a class="nav-link" href="../valarnum">STIMULATION<span
+							class="sr-only">(current)</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="#">EXPLORATION</a></li>
+					<li class="nav-item dropdown">
+				        <a class="nav-link dropdown-toggle" href="#" id="nbddSources" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				          SOURCES
+				        </a>
+				        <div id="nbddSourcesListe" class="dropdown-menu" aria-labelledby="navbarDropdown">
+				          <a id="nbddSourcesAlea" class="dropdown-item" href="#">Alea</a>
+				          <a id="nbddSourcesAjout" class="dropdown-item" href="#">Ajouter</a>
+				          <div class="dropdown-divider"></div>
+				        </div>
+				    </li>					
+				</ul>
+				<form class="form-inline my-2 my-lg-0">
+					<button id="uti" class="btn btn-outline-success my-2 my-sm-0" type="button"></button>
+					<button class="btn btn-outline-danger my-2 my-sm-0" onclick="deconnexion()" type="button">déconnexion</button>
+				</form>
+			</div>
+		</nav>	  
+		<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center">
+			<ol class="carousel-indicators" id="car-ind">
+			</ol>
+			<div class="carousel-inner" id="car-inn">
+			</div>
+			<!--  
+			<a class="carousel-control-prev" href="#carouselEvals"
+				role="button" data-slide="prev"> <span
+				class="carousel-control-prev-icon" aria-hidden="true"></span> <span
+				class="sr-only">Previous</span>
+			</a> <a class="carousel-control-next" href="#carouselEvals"
+				role="button" data-slide="next"> <span
+				class="carousel-control-next-icon" aria-hidden="true"></span> <span
+				class="sr-only">Next</span>
+			</a>
+			-->
+		</div>		
+  		<!--  
+	    <figure>
+	      <picture>
+	        <img id='imgEval' src="" alt="">
+	      </picture>
+	      <figcaption id='imgLabel' ></figcaption>
+	    </figure>
+	    -->
+	</div>
+  <script>
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function(registration) {
+          console.log('Service Worker registration successful with scope: ',
+          registration.scope);
+        })
+        .catch(function(err) {
+          console.log('Service Worker registration failed: ', err);
+        });
+    }
+
+  </script>
+    
+	<script src="scripts/d3.min.js"></script>
+	<script src="scripts/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
+  </body>
+</html>
