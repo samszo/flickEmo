@@ -16,3 +16,18 @@ figure {
 .modal-content{
     background-color: #6b777d;	
 }
+
+.curseur {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	z-index: 110;
+}
+#curseur {
+	width: 0px;
+	height: 0px;
+	overflow:hidden;
+}
+#curseurSelect {
+	text-align: center;
+}

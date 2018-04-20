@@ -74,9 +74,8 @@
         });
       };      
       
-      var dataPhoto, evalPhoto, svgChoix, nbEval = 10, scale = 0.3;
-      var width = window.innerWidth;
-      var height = window.innerHeight-100;
+      var dataPhoto, evalPhoto, svgChoix, nbEval = 10, scale = 0.3, tofSelect;
+      var width = window.innerWidth, height = window.innerHeight-100, marginTop=16;
       
       var apiKey='40cb47fff0cc7278c71dbec0b496a961', method = 'flickr.groups.pools.getPhotos&group_id=';//flickr.photosets.getPhotos&photoset_id=
       var ps = '72157693492155044';//72157694232835035,72157664802687517,72157694698922995,72157691214578762,72157693492155044
@@ -209,7 +208,7 @@
 	</div>  
 	
 	<div class="container-fluid">	  
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<nav id="nbMain" class="navbar navbar-expand-lg navbar-dark bg-dark">
 			<a class="navbar-brand" href="#">
 				<h4 class="text-center" >Flick Emo</h4>
 				<h5 id='titreListe' style="font-style:italic;" ></h5>
@@ -247,7 +246,7 @@
 				</form>
 			</div>
 		</nav>	  
-		<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center">
+		<div id="carouselEvals" class="carousel slide" data-ride="carousel" style="text-align:-webkit-center;margin-top: 16px;">
 			<ol class="carousel-indicators" id="car-ind">
 			</ol>
 			<div class="carousel-inner" id="car-inn">
@@ -263,7 +262,13 @@
 				class="sr-only">Next</span>
 			</a>
 			-->
-		</div>		
+		</div>
+		<div id="curseur" class="curseur">
+			<div id="curseurChoix" class="curseur"></div>
+			<div id="curseurPalette" class="curseur"></div>
+			<h3 id="curseurSelect" class="curseur"></h3>
+		</div>
+				
   		<!--  
 	    <figure>
 	      <picture>
@@ -292,5 +297,6 @@
 	<script src="scripts/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
+	<script src="scripts/plutchickWheel.js"></script>
   </body>
 </html>
