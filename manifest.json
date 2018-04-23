@@ -1,0 +1,24 @@
+{
+  "short_name": "FlickEmo",
+  "name": "Feuilleter des émotions",
+  "icons": [
+    {
+      "src": "images/flickEmo-icon-1x.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "images/flickEmo-icon-2x.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "images/flickEmo-icon-4x.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}

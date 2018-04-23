@@ -53,6 +53,7 @@ function updateListeObjet(objets){
     	})
     	.on("click",getSource)
     if(objets.length)getSource(objets[0]);
+    else $('#modalWait').modal('hide');
 }
 
 function getSource(d){
@@ -63,6 +64,7 @@ function getSource(d){
 		if(data.error){
 			console.log("ERREUR : "+data.error.message);
 		}else{
+			idSource = d.doc_id
 			d3.select('#titreListe').text(d.titre);
 			d3.select('#numTof').text("1");
 			d3.select('#nbTof').text(data.photos.total);
@@ -205,26 +207,7 @@ function ajoutPhotosGallerie(){
 	.style('max-height',height+"px")
 	.attr('src',function(d){
 		return d.url_z;
-	})
-	.on('click',function(d){
-	        //affiche les fonds des fragments
-	        d3.selectAll(".gCurseur").selectAll('path').style('fill-opacity',1);
-	  		//commence la sélection en bloquant le curseur
-	  		onSelect = true;
-	  		//stop le flux d'image
-	  		onFlux = false;
-	  		$('.carousel').carousel('pause');
-	  		//récupère la photo de dessous par filtrage des coordonnées
-	  		//car pas trouvé le moyen de le faire sur un event de la photo
-	  		//à cause de la séparation des div entre curseur et photo
-	  		var m = d3.mouse(this);    	  		
-	  		//var m = d3.event;    	  		
-			tofSelect = d;
-	  		//met les bords en rouge
-    	  	d3.select('#carImg_'+tofSelect.id)
-    	  		.style('border-style','solid')
-    	  		.style('border-color','red');		
-		});   
+	});   
 	
 	//ajoute le descriptif
 	var block = items.append('div').attr('class','carousel-caption d-none d-md-block');
@@ -260,32 +243,23 @@ function initCarousel(){
 	$('#carouselEvals').on('slid.bs.carousel', function (e) {
 		//console.log(e);
 		//showTofEvals(e);
-		var dt = dataPhoto[e.to];
+		tofSelect = dataPhoto[e.to];
 		d3.select('#numTof').text(e.from+1); 
-		var t = document.getElementById('img'+dt.id);
+		var t = document.getElementById('img'+tofSelect.id);
 		var nb = document.getElementById('nbMain');		
-		//redimensionne le curseur
-		wCurseur = t.clientWidth/2;
-		hCurseur = t.clientHeight/2;
-		var svg = d3.select("#"+idSvg).transition().duration(10)
-		    .attr("width", wCurseur)
-		    .attr("height", hCurseur)		
 		//calcul le point 0, 0
-		var x = t.offsetLeft-(wCurseur/2)+marginTop;//x;///2;//+(t.width/2);	
-		//var y = t.offsetTop+nb.clientHeight;//+(hCurseur/2);//y;///2;//+(t.height/2);	
-		var y = nb.clientHeight+marginTop-(hCurseur/2);//y;///2;//+(t.height/2);	
+		var x = t.offsetLeft+marginTop;
+		var y = nb.clientHeight+marginTop;	
 		dataPhoto[e.to]['x0']=x;
 		dataPhoto[e.to]['y0']=y;		//
-		//on place le curseur au centre de la photo
-		moveCurseur(x+(t.clientWidth/2), y+(t.clientHeight/2));
-		//on place le div pour les cercles émotionnels
-		d3.select("#curseurChoix").attr("x", t.x).attr("y", t.y).attr("width", t.clientWidth).attr("height", t.clientHeight);		
+		//on place le curseur-
+		moveCurseur(x, y, t.clientHeight, t.clientWidth);
 	})
 
 	$('.carousel').carousel();
 	$('.carousel').carousel('cycle');
 	//$('.carousel').carousel('pause');
-	$('.carousel').carousel(dataPhoto.length-1);		
+	//$('.carousel').carousel(dataPhoto.length-1);		
 
 }	  
 

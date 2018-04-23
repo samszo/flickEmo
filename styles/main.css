@@ -31,3 +31,6 @@ figure {
 #curseurSelect {
 	text-align: center;
 }
+#curseurChoix {
+	z-index: 100;
+}

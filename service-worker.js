@@ -3,18 +3,18 @@
   'use strict';
 
   var filesToCache = [
-	//'styles/main.css',
-    'scripts/firebase.js',
-    'scripts/firebase-ui-auth__fr.js',
+	'styles/main.css',
+    'styles/firebase-ui-auth.css',
     'scripts/d3.min.js',
+    'scripts/firebase-ui-auth__fr.js',
+    'scripts/firebase.js',
     'scripts/jquery.min.js',
+    'scripts/main.js',
+    'scripts/plutchickWheel.js',
     'index.html',
     'evalEmo.html',
-    'pages/offline.html',
-    'pages/404.html',
     'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
     'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
-    'styles/firebase-ui-auth.css',
     'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'
   ];
 

@@ -68,8 +68,9 @@
         	    .attr("height", hCurseur)
         		.attr("viewBox","0 0 "+w+" "+h);	
 		//création du svg pour les cercles émotionnels
-	    svgTof = d3.select("#curseurChoix").append("svg").attr("width", width).attr("height", height);		
-        //supprime le text
+	    svgTof = d3.select("#curseurChoix").append("svg")
+	    	.on('click',selectTof);
+	    //supprime le text
 	    d3.selectAll('text').remove();
 
 	    //ajoute la class aux éléments du curseur
@@ -142,56 +143,78 @@
 	  			curSelect = d;	    
 				console.log("OUT = "+curSelect.o.idG+' = '+d.o.idG);       	    
   			})
-	  		.on('mousedown',function(d, i){
-	  			if(!onChoix)return;
-	  			//merci à  https://stackoverflow.com/questions/15505272/javascript-while-mousedown
-	  			if(mousedownID==-1){  //Prevent multimple loops!		  			
-	  				curSelect = d;
-        	  			//ajoute un cercle de la couleur
-        	  			cChoix = svgTof.append('circle')
-        	  				.attr("class",'choix')
-        	  				.attr("cx",0)
-        	  				.attr("cy",rChoix)
-        	  				.attr("r",rChoix)
-        	  				.style('fill-opacity',0.3)       	  				
-        	  				.style("fill",d.o.color)
-        	  				.attr('transform', 'translate(' + l + ',' + t + ')')
-        	  				;
-	  			    mousedownID = setInterval(augmenteChoix, 100 /*execute every 100ms*/); 			     	  			    	  				
-	  			}
-	  		})
-	  		.on('mouseup',function(d,i){
-	  			if(!onChoix)return;
-	  			if(mousedownID!=-1) {  //Only stop if exists
-	  			     clearInterval(mousedownID);
-	  			     mousedownID=-1;
-	 	  			stockeChoix(d);    	  			  			
-	  			}
-  			});
+	  		.on('mousedown',downPalette)
+	  		.on('touchstart',downPalette)
+	  		.on('mouseup',upPalette)
+	  		.on('touchend',upPalette);
+        
 		
 		//lance l'animation de couleur
         setInterval(showCurseurFragment, 1000);
 	  	
 	});	 	
+	function downPalette(d,i){
+		if(!onChoix)return;
+		//merci à  https://stackoverflow.com/questions/15505272/javascript-while-mousedown
+		if(mousedownID==-1){  //Prevent multimple loops!		  			
+			curSelect = d;
+  			//ajoute un cercle de la couleur
+  			cChoix = svgTof.append('circle')
+  				.attr("class",'choix')
+  				.attr("cx",0)
+  				.attr("cy",rChoix)
+  				.attr("r",rChoix)
+  				.style('fill-opacity',0.3)       	  				
+  				.style("fill",d.o.color)
+  				.attr('transform', 'translate(' + l + ',' + t + ')')
+  				;
+		    mousedownID = setInterval(augmenteChoix, 100 /*execute every 100ms*/); 			     	  			    	  				
+		}		
+	}
+	function upPalette(d,i){
+		if(!onChoix)return;
+		if(mousedownID!=-1) {  //Only stop if exists
+		     clearInterval(mousedownID);
+		     mousedownID=-1;
+  			stockeChoix(d);    	  			  			
+		}		
+	}
 	
-	function moveCurseur(x, y){
+	function moveCurseur(x, y, h, w){
 		//affiche la palette
 		d3.select("#curseur")
     	    .style("overflow","unset");
+		//supprime les choix
+		svgTof.selectAll('circle').remove();		
+		//redimensionne le curseur
+		wCurseur = w/2;
+		hCurseur = h/2;
+		var svg = d3.select("#"+idSvg).transition().duration(10)
+		    .attr("width", wCurseur)
+		    .attr("height", hCurseur)		
+		//calcul le point 0, 0
+		var xMid = x + (w/2)-(wCurseur/2);	
+		var yMid = y + (h/2)-hCurseur/2;			
+		
 		//positionne la palette
 		d3.select("#curseurPalette")
-	        .style("left",  x + "px")
-	        .style("top", y + "px");
+	        .style("left",  xMid + "px")
+	        .style("top", yMid + "px");
 		//positionne la légende
 		d3.select("#curseurSelect")
             .style("width", wCurseur+"px")
-            .style("left", x+"px")
+            .style("left", xMid+"px")
             .style("top", function(){
-            	return (y-this.clientHeight)+"px";
+            	return (yMid-this.clientHeight)+"px";
             });		
+		//on place le div et le svg pour les cercles émotionnels
+		d3.select("#curseurChoix")
+			.style("left", x+"px")
+			.style("top", y+"px");
+		svgTof.attr("width", w+"px").attr("height", h+"px");		        		
 		//position du cercle
-        l = x;
-        t = y;
+        l = (w/2);//+(rChoix);
+        t = (h/2)-(rChoix);
 	}
 	
     function showCurseurFragment(){
@@ -213,6 +236,21 @@
 			.style('color',d.o.color)
         	    .text(d.o.fr);        
     }
+    
+    function selectTof(){
+        //affiche les fonds des fragments
+        d3.selectAll(".gCurseur").selectAll('path').style('fill-opacity',1);
+  		//commence la sélection en bloquant le curseur
+  		onSelect = true;
+  		//stop le flux d'image
+  		onFlux = false;
+  		$('.carousel').carousel('pause');
+  		//met les bords en rouge
+	  	d3.select('#carImg_'+tofSelect.id)
+	  		.style('border-style','solid')
+	  		.style('border-color','red');		
+    	
+    }
 
     function stockeChoix(d){
 		console.log('stockeChoix');	
@@ -221,16 +259,16 @@
 		//calcul la position du choix par rapport à l'image
 		//var x = l+(wCurseur/2)-rChoix-tofSelect.x0+tofSelect.data.x
 		//	, y = t+(hCurseur/2)-rChoix-tofSelect.y0+tofSelect.data.y;
-		var x = l-tofSelect.x0+tofSelect.data.x
-		, y = t-tofSelect.y0+tofSelect.data.y;
+		var x = l-tofSelect.x0+tofSelect.x0
+		, y = t-tofSelect.y0+tofSelect.y0;
 
 		//récupère l'évaluation pour la photo omk
 		var to = tofEval.filter(function(d){
 			return d.id == tofSelect.id;
 			});
 		//enregistre les références de l'émotion dans la photo
-		var ev = {'img':tofSelect.data.img
-			,'x':tofSelect.data.x,'y':tofSelect.data.y,'w':tofSelect.data.w,'h':tofSelect.data.h
+		var ev = {'img':tofSelect.url_z
+			,'x':tofSelect.x0,'y':tofSelect.y0,'w':tofSelect.width_z,'h':tofSelect.height_z
 			,'cx':x,'cy':y,'r':cChoix.attr("r"),'d':d.o};
 			
 		//enregistre l'évaluation dans la base		
@@ -242,32 +280,55 @@
 			 to[0].evals.push(ev);
 		}else{
 			//création de la référence de la photo
-			tofEval.push({'idOmkMedia':tofSelect.data.idOmkMedia,'idOmkItem':tofSelect.data.idOmkItem,'label':tofSelect.data.label
-				,'original':tofSelect.data.original
-				,'h':tofSelect.data.height,'w':tofSelect.data.width
-				,'scaleX':d3.scaleLinear().domain([0, tofSelect.data.w])
-				,'scaleY':d3.scaleLinear().domain([0, tofSelect.data.h])
+			tofEval.push({'id':tofSelect.id,'label':tofSelect.title
+				,'original':tofSelect.url_z
+				,'data':tofSelect
+				,'h':tofSelect.height_z,'w':tofSelect.width_z
 				,'evals':[ev]
 				});
 
 		}			
+				
+		//déselectionne la photo
+	  	d3.select('#carImg_'+tofSelect.id).style('border-style','none');
 		
-		
-		//augmente le Z-index du curseur pour que les événements soient pris en compte
-		//d3.selectAll('.curseur').style('z-index',parseInt(cChoix.style("z-index"))+1);	
-		//déselectionne toutes les photos
-		d3.selectAll('.node').style('border-style','none');		
-		tofSelect = false;
 		//relache le curseur
 		onSelect = false;	  			
 		onChoix = false;
 		onFlux = true;
+		//relance le diaporama
+  		$('.carousel').carousel('cycle');
+		
 	}
 
     function augmenteChoix(){
-		console.log('augmenteChoix '+cChoix.attr("r"));			
+		//console.log('augmenteChoix '+cChoix.attr("r"));			
 		//cache les fragment saufs celui slectionné
         d3.selectAll(".gCurseur").selectAll('path').style('fill-opacity',0);
         d3.select("#"+curSelect.o.idG).selectAll('path').style('fill-opacity',1);		
 		cChoix.attr("r",parseInt(cChoix.attr("r"))+10);
 	}
+
+	function sauveEmo(tof, e) {
+
+		//récupère les référence de la source
+		var doc = {'idSource':idSource,'data':tof};		
+		e.color = e.d.color;
+		e.d = e.d.fr;
+		var p = {'q':'emo','doc':doc,'eval':e,'idBase':uti.idBase,'idUti':uti.idUti};			
+	    $.ajax({
+	    		url: ajaxServer+"/sauve",
+	    		dataType: "json",
+	    		data: p,
+	    		method: "GET",
+	        	error: function(error){
+	        		console.log("Erreur : "+error.responseText);
+	        	},            	
+	        	success: function(data) {
+	  			  console.log(data);
+	        }
+		});	        
+
+		
+	}    
+    

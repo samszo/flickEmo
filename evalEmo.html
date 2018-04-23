@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Flick Emo : evaluation</title>
+	<link rel="manifest" href="manifest.json">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"  crossorigin="anonymous">  
 	<link type="text/css" rel="stylesheet" href="styles/main.css" />  
 	<script src="scripts/main.js"></script>
@@ -22,32 +23,44 @@
 	  firebase.initializeApp(config);
 	</script>
     <script type="text/javascript">
-    var objAjout;
-    window.addEventListener('load', function() {
-  		$('#modalWait').modal();
-    	
-    	
-  	  	//gestion des evenements du menu
-    	$("#nbddSourcesAlea").click(function() {
-    		  console.log('nbddSourcesAlea');
-    			});
-      	$("#nbddSourcesAjout").click(function() {
-      		  console.log('nbddSourcesAjout');
-	      		$('#modalAjoutObjet').modal();
-      		});
-  	  	//gestion des evenements des modals
-    	$("#modalAjoutBtn").click(function() {
-      		$('#modalAjoutObjet').modal('hide');
-      		$('#modalWait').modal();
-    		var typeObj = $('input[name=rbTypeObjet]:checked').val();
-    		var idObj = $("#ajoutIdObjet").val()
-    		setObjetUti(idObj,typeObj);
-  			});
-      	
-  	  	//ajoute les photos
-		//getPhotos();
-		initApp();
-    });
+    (function() {
+    	'use strict';
+	    var objAjout;
+	    window.addEventListener('load', function() {
+	  		$('#modalWait').modal();
+	    	
+	  		// Fetch all the forms we want to apply custom Bootstrap validation styles to
+	  	    var form = document.getElementById('frmAjoutSource');
+	  		
+	  	  	//gestion des evenements du menu
+	    	$("#nbddSourcesAlea").click(function() {
+	    		  console.log('nbddSourcesAlea');
+	    			});
+	      	$("#nbddSourcesAjout").click(function() {
+	      		  console.log('nbddSourcesAjout');
+		      		$('#modalAjoutObjet').modal();
+	      		});
+	  	  	//gestion des evenements des modals
+	    	$("#modalAjoutBtn").click(function() {
+	  	        if (form.checkValidity() === false) {
+		  	          event.preventDefault();
+		  	          event.stopPropagation();
+	  	        }else{
+	  	      		$('#modalAjoutObjet').modal('hide');
+	  	      		$('#modalWait').modal();
+	  	    		var typeObj = $('input[name=rbTypeObjet]:checked').val();
+	  	    		var idObj = $("#validationAjoutIdObjet").val()
+	  	    		setObjetUti(idObj,typeObj);  	        	
+	  	        }  	      	
+	  	        form.classList.add('was-validated');
+	    		
+	  			});
+	      	
+	  	  	//ajoute les photos
+			//getPhotos();
+			initApp();
+	    });
+    })();
 
     initApp = function() {
         firebase.auth().onAuthStateChanged(function(user) {
@@ -74,7 +87,7 @@
         });
       };      
       
-      var dataPhoto, evalPhoto, svgChoix, nbEval = 10, scale = 0.3, tofSelect;
+      var dataPhoto, evalPhoto, svgChoix, nbEval = 10, scale = 0.3, tofSelect, idSource;
       var width = window.innerWidth, height = window.innerHeight-100, marginTop=16;
       
       var apiKey='40cb47fff0cc7278c71dbec0b496a961', method = 'flickr.groups.pools.getPhotos&group_id=';//flickr.photosets.getPhotos&photoset_id=
@@ -95,27 +108,28 @@
 	        </button>
 	      </div>
 	      <div class="modal-body">
-	        <form>
+	        <form id="frmAjoutSource" class="needs-validation" novalidate>
 	          <div class="form-group">	        
 	            <label for="ajoutIdObjet" class="col-form-label">Type de source :</label>
 				<div class="custom-control custom-radio custom-control-inline">
-				  <input type="radio" id="rbGallerie" value="photosets"  name="rbTypeObjet" class="custom-control-input">
-				  <label class="custom-control-label" for="rbGallerie">Album</label>
+				  <input type="radio" id="validationRbGallerie" value="photosets"  name="rbTypeObjet" class="custom-control-input" required>
+				  <label class="custom-control-label" for="validationRbGallerie">Album</label>
 				</div>
 				<div class="custom-control custom-radio custom-control-inline">
-				  <input type="radio" id="rbGroupe" value="group" name="rbTypeObjet" class="custom-control-input">
-				  <label class="custom-control-label" for="rbGroupe">Groupe</label>
+				  <input type="radio" id="validationRbGroupe" value="group" name="rbTypeObjet" class="custom-control-input" required>
+				  <label class="custom-control-label" for="validationRbGroupe">Groupe</label>
 				</div>	        
 	          </div>
 	          <div class="form-group">
-	            <label for="ajoutIdObjet" class="col-form-label">identifiant de la source :</label>
-	            <input type="text" class="form-control" id="ajoutIdObjet" placeholder="3070672@N22">
-	          </div>
+	            <label for="validationajoutIdObjet" class="col-form-label">identifiant de la source :</label>
+	            <input type="text" class="form-control" id="validationAjoutIdObjet" placeholder="3070672@N22" required>
+				<div class="invalid-feedback">Merci de saisir l'identifiant de la source.</div>
+              </div>
 	        </form>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-	        <button type="button" id="modalAjoutBtn" class="btn btn-primary">Ajouter</button>
+	        <button type="button" type="submit" id="modalAjoutBtn" class="btn btn-primary">Ajouter</button>
 	      </div>
 	    </div>
 	  </div>
